@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculator</title>
+
+  <style>
+    :root {
+      --page: #e9eef5;
+      --body: #f8f9fb;
+      --key: #ffffff;
+      --key-border: #d9dee7;
+      --ink: #1f2430;
+      --muted: #6b7385;
+      --blue: #1a73e8;
+      --blue-soft: #e3edfd;
+      --red: #d93025;
+      --yellow-soft: #fdf1c7;
+      --yellow-ink: #6b4e00;
+      --key-hover: #eef1f6;
+      --blue-soft-hover: #d3e3fb;
+      --blue-hover: #1765cc;
+      --on-blue: #ffffff;
+    }
+
+    [data-theme="dark"] {
+      --page: #14171c;
+      --body: #1e232b;
+      --key: #2a313b;
+      --key-border: #3a4350;
+      --ink: #e8ebf0;
+      --muted: #98a1b3;
+      --blue: #8ab4f8;
+      --blue-soft: #27364d;
+      --red: #f28b82;
+      --yellow-soft: #3d3417;
+      --yellow-ink: #f6d77a;
+      --key-hover: #343c48;
+      --blue-soft-hover: #31456a;
+      --blue-hover: #a8c7fa;
+      --on-blue: #10223d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--page);
+      color: var(--ink);
+      font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .app {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+      justify-content: center;
+    }
+
+    .calculator, .history {
+      background: var(--body);
+      border: 1px solid var(--key-border);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .calculator { width: 340px; }
+    .history    { width: 260px; max-height: 560px; display: flex; flex-direction: column; }
+
+    .topbar { margin-bottom: 6px; }
+    .menu { position: relative; display: inline-block; }
+    #menuButton {
+      border: 1px solid var(--key-border);
+      background: var(--key);
+      color: var(--ink);
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .menu-list {
+      position: absolute; top: 110%; left: 0; z-index: 5;
+      min-width: 170px;
+      background: var(--key);
+      border: 1px solid var(--key-border);
+      border-radius: 12px;
+      padding: 6px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    }
+    .menu-list button {
+      display: block; width: 100%;
+      text-align: left;
+      border: none; background: none;
+      color: var(--ink);
+      padding: 9px 10px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    .menu-list button:hover { background: var(--key-hover); }
+
+    .display {
+      text-align: right;
+      padding: 8px 6px 14px;
+      min-height: 96px;
+    }
+    #previous { color: var(--muted); font-size: 0.95rem; min-height: 1.3em; }
+    #current  {
+      font-size: 2.4rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      overflow-wrap: anywhere;
+    }
+
+    .autofill {
+      background: var(--yellow-soft);
+      color: var(--yellow-ink);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 0.9rem;
+    }
+    .autofill p { margin: 0 0 8px; }
+    .autofill .numbers { display: flex; flex-wrap: wrap; gap: 6px; }
+    .autofill button {
+      width: 32px; height: 32px;
+      border: none; border-radius: 8px;
+      background: var(--key); color: var(--yellow-ink);
+      font-weight: 600; cursor: pointer;
+    }
+    .autofill button:hover { background: var(--yellow-ink); color: var(--yellow-soft); }
+    .hidden { display: none !important; }
+
+    .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+    .keys button {
+      height: 62px;
+      border: 1px solid var(--key-border);
+      border-radius: 14px;
+      background: var(--key);
+      color: var(--ink);
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+    .keys button:hover  { background: var(--key-hover); }
+    .keys button:active { transform: scale(0.97); }
+
+    .keys .op     { background: var(--blue-soft); color: var(--blue); border-color: transparent; font-weight: 600; }
+    .keys .op:hover { background: var(--blue-soft-hover); }
+    .keys .clear  { color: var(--red); font-weight: 600; }
+    .keys .equals { background: var(--blue); color: var(--on-blue); border-color: transparent; grid-row: span 2; height: auto; }
+    .keys .equals:hover { background: var(--blue-hover); }
+    .keys .zero   { grid-column: span 2; }
+
+    button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+    .history-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .history h2   { margin: 0; font-size: 1.1rem; }
+    #clearHistory {
+      border: none; background: none; color: var(--red);
+      cursor: pointer; font-size: 0.9rem;
+    }
+    #historyList { list-style: none; margin: 0; padding: 0; overflow-y: auto; }
+    #historyList li {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 8px; padding: 10px 6px;
+      border-bottom: 1px solid var(--key-border);
+    }
+    .history-item { cursor: pointer; flex: 1; overflow-wrap: anywhere; }
+    .history-item small { display: block; color: var(--muted); }
+    .history-item strong { font-size: 1.1rem; }
+    .delete {
+      border: none; background: none; color: var(--muted);
+      font-size: 1.2rem; cursor: pointer;
+    }
+    .delete:hover { color: var(--red); }
+    .empty { color: var(--muted); font-size: 0.9rem; padding: 10px 6px; }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+
+    <section class="calculator">
+      <div class="topbar">
+        <div class="menu">
+          <button id="menuButton" aria-haspopup="true" aria-expanded="false">Options ▾</button>
+          <div id="menuList" class="menu-list hidden">
+            <button id="toggleHistory">View history</button>
+            <button id="toggleTheme">Dark theme</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="display">
+        <div id="previous"></div>
+        <div id="current">0</div>
+      </div>
+
+      <div id="autofill" class="autofill hidden">
+        <p id="autofillText"></p>
+        <div id="autofillButtons" class="numbers"></div>
+      </div>
+
+      <div class="keys">
+        <button class="clear" data-key="C">C</button>
+        <button class="clear" data-key="back">⌫</button>
+        <button class="op" data-key="÷">÷</button>
+        <button class="op" data-key="×">×</button>
+
+        <button data-key="7">7</button>
+        <button data-key="8">8</button>
+        <button data-key="9">9</button>
+        <button class="op" data-key="-">−</button>
+
+        <button data-key="4">4</button>
+        <button data-key="5">5</button>
+        <button data-key="6">6</button>
+        <button class="op" data-key="+">+</button>
+
+        <button data-key="1">1</button>
+        <button data-key="2">2</button>
+        <button data-key="3">3</button>
+        <button class="equals" data-key="=">=</button>
+
+        <button class="zero" data-key="0">0</button>
+        <button data-key=".">.</button>
+      </div>
+    </section>
+
+    <aside id="historyPanel" class="history hidden">
+      <div class="history-head">
+        <h2>History</h2>
+        <button id="clearHistory">Clear all</button>
+      </div>
+      <ul id="historyList"></ul>
+    </aside>
+
+  </main>
+
+  <script>
+    const currentEl  = document.getElementById('current');
+    const previousEl = document.getElementById('previous');
+    const autofillBox     = document.getElementById('autofill');
+    const autofillText    = document.getElementById('autofillText');
+    const autofillButtons = document.getElementById('autofillButtons');
+    const historyList = document.getElementById('historyList');
+
+    const operators = ['+', '-', '×', '÷'];
+
+    let expression = '';
+    let justCalculated = false;
+    let history = JSON.parse(localStorage.getItem('calcHistory')) || [];
+
+    function render() {
+      currentEl.textContent = expression || '0';
+      currentEl.style.fontSize = expression.length > 14 ? '1.5rem' : '2.4rem';
+      checkAutofill();
+    }
+
+    function press(key) {
+      const last = expression.slice(-1);
+
+      if (operators.includes(key)) {
+        if (expression === '') {
+          if (key === '-') expression = '-';
+        } else if (expression !== '-') {
+          if (operators.includes(last)) {
+            expression = expression.slice(0, -1) + key;
+          } else {
+            expression += key;
+          }
+          justCalculated = false;
+        }
+      } else {
+        if (justCalculated) {
+          expression = '';
+          previousEl.textContent = '';
+          justCalculated = false;
+        }
+        if (key === '.') {
+          const lastNumber = expression.split(/[+\-×÷]/).pop();
+          if (lastNumber.includes('.')) return;
+          if (lastNumber === '') key = '0.';
+        }
+        expression += key;
+      }
+      render();
+    }
+
+    function backspace() {
+      expression = expression.slice(0, -1);
+      justCalculated = false;
+      render();
+    }
+
+    function clearAll() {
+      expression = '';
+      previousEl.textContent = '';
+      justCalculated = false;
+      render();
+    }
+
+    function calculate(expr) {
+      const tokens = expr.match(/\d+\.?\d*|[+\-×÷]/g);
+
+      if (tokens[0] === '-') {
+        tokens.shift();
+        tokens[0] = '-' + tokens[0];
+      }
+
+      const numbers = [Number(tokens[0])];
+      const pending = [];
+      for (let i = 1; i < tokens.length; i += 2) {
+        const op = tokens[i];
+        const num = Number(tokens[i + 1]);
+        const lastIndex = numbers.length - 1;
+
+        if (op === '×') {
+          numbers[lastIndex] *= num;
+        } else if (op === '÷') {
+          if (num === 0) return null;
+          numbers[lastIndex] /= num;
+        } else {
+          pending.push(op);
+          numbers.push(num);
+        }
+      }
+
+      let result = numbers[0];
+      pending.forEach((op, i) => {
+        result += (op === '+') ? numbers[i + 1] : -numbers[i + 1];
+      });
+
+      return Math.round(result * 1e10) / 1e10;
+    }
+
+    function equals() {
+      let expr = expression;
+      if (operators.includes(expr.slice(-1))) expr = expr.slice(0, -1);
+      if (!/[+\-×÷]/.test(expr.slice(1))) return;
+
+      const result = calculate(expr);
+
+      if (result === null) {
+        expression = '';
+        render();
+        previousEl.textContent = "Can't divide by 0";
+        return;
+      }
+
+      history.unshift({ expr: expr, result: result });
+      saveHistory();
+      renderHistory();
+
+      previousEl.textContent = expr + ' =';
+      expression = String(result);
+      justCalculated = true;
+      render();
+    }
+
+    function findPattern() {
+      const match = expression.match(/[+\-×÷]\d+\.?\d*$/);
+      if (!match) return null;
+
+      const chunk = match[0];
+      let count = 0;
+      let rest = expression;
+      while (rest.endsWith(chunk)) {
+        count++;
+        rest = rest.slice(0, -chunk.length);
+      }
+      return count >= 3 ? { chunk: chunk, count: count } : null;
+    }
+
+    function checkAutofill() {
+      const pattern = justCalculated ? null : findPattern();
+      if (!pattern) {
+        autofillBox.classList.add('hidden');
+        return;
+      }
+      autofillText.textContent =
+        'Pattern ' + pattern.chunk + ' repeated ' + pattern.count + ' times. Repeat it more:';
+      autofillBox.classList.remove('hidden');
+    }
+
+    for (let n = 1; n <= 10; n++) {
+      const btn = document.createElement('button');
+      btn.textContent = n;
+      btn.addEventListener('click', function () {
+        const pattern = findPattern();
+        if (pattern) {
+          expression += pattern.chunk.repeat(n);
+          render();
+        }
+      });
+      autofillButtons.appendChild(btn);
+    }
+
+    function saveHistory() {
+      localStorage.setItem('calcHistory', JSON.stringify(history));
+    }
+
+    function renderHistory() {
+      historyList.innerHTML = '';
+
+      if (history.length === 0) {
+        const empty = document.createElement('li');
+        empty.className = 'empty';
+        empty.textContent = 'No calculations yet.';
+        historyList.appendChild(empty);
+        return;
+      }
+
+      history.forEach(function (item, index) {
+        const li = document.createElement('li');
+
+        const info = document.createElement('div');
+        info.className = 'history-item';
+        info.innerHTML = '<small></small><strong></strong>';
+        info.querySelector('small').textContent = item.expr + ' =';
+        info.querySelector('strong').textContent = item.result;
+        info.title = 'Click to use this result';
+        info.addEventListener('click', function () {
+          expression = String(item.result);
+          previousEl.textContent = '';
+          justCalculated = true;
+          render();
+        });
+
+        const del = document.createElement('button');
+        del.className = 'delete';
+        del.textContent = '×';
+        del.title = 'Delete this entry';
+        del.addEventListener('click', function () {
+          history.splice(index, 1);
+          saveHistory();
+          renderHistory();
+        });
+
+        li.appendChild(info);
+        li.appendChild(del);
+        historyList.appendChild(li);
+      });
+    }
+
+    document.getElementById('clearHistory').addEventListener('click', function () {
+      history = [];
+      saveHistory();
+      renderHistory();
+    });
+
+    document.querySelectorAll('.keys button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const key = btn.dataset.key;
+        if (key === 'C') clearAll();
+        else if (key === 'back') backspace();
+        else if (key === '=') equals();
+        else press(key);
+      });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (/^[0-9.]$/.test(e.key) || e.key === '+' || e.key === '-') press(e.key);
+      else if (e.key === '*') press('×');
+      else if (e.key === '/') { e.preventDefault(); press('÷'); }
+      else if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); equals(); }
+      else if (e.key === 'Backspace') backspace();
+      else if (e.key === 'Escape') clearAll();
+    });
+
+    const menuButton   = document.getElementById('menuButton');
+    const menuList     = document.getElementById('menuList');
+    const historyPanel = document.getElementById('historyPanel');
+    const historyBtn   = document.getElementById('toggleHistory');
+    const themeBtn     = document.getElementById('toggleTheme');
+
+    function closeMenu() {
+      menuList.classList.add('hidden');
+      menuButton.setAttribute('aria-expanded', 'false');
+    }
+
+    menuButton.addEventListener('click', function () {
+      const isOpen = menuList.classList.toggle('hidden') === false;
+      menuButton.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.menu')) closeMenu();
+    });
+
+    historyBtn.addEventListener('click', function () {
+      const isHidden = historyPanel.classList.toggle('hidden');
+      historyBtn.textContent = isHidden ? 'View history' : 'Hide history';
+      closeMenu();
+    });
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      themeBtn.textContent = (theme === 'dark') ? 'Light theme' : 'Dark theme';
+      localStorage.setItem('calcTheme', theme);
+    }
+
+    themeBtn.addEventListener('click', function () {
+      const now = document.documentElement.getAttribute('data-theme');
+      setTheme(now === 'dark' ? 'light' : 'dark');
+      closeMenu();
+    });
+
+    setTheme(localStorage.getItem('calcTheme') || 'light');
+
+    render();
+    renderHistory();
+  </script>
+</body>
+</html>
