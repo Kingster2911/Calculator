@@ -16,30 +16,10 @@
       --blue: #1a73e8;
       --blue-soft: #e3edfd;
       --red: #d93025;
-      --yellow-soft: #fdf1c7;
-      --yellow-ink: #6b4e00;
       --key-hover: #eef1f6;
       --blue-soft-hover: #d3e3fb;
       --blue-hover: #1765cc;
       --on-blue: #ffffff;
-    }
-
-    [data-theme="dark"] {
-      --page: #14171c;
-      --body: #1e232b;
-      --key: #2a313b;
-      --key-border: #3a4350;
-      --ink: #e8ebf0;
-      --muted: #98a1b3;
-      --blue: #8ab4f8;
-      --blue-soft: #27364d;
-      --red: #f28b82;
-      --yellow-soft: #3d3417;
-      --yellow-ink: #f6d77a;
-      --key-hover: #343c48;
-      --blue-soft-hover: #31456a;
-      --blue-hover: #a8c7fa;
-      --on-blue: #10223d;
     }
 
     * { box-sizing: border-box; }
@@ -63,7 +43,7 @@
       justify-content: center;
     }
 
-    .calculator, .history {
+    .calculator {
       background: var(--body);
       border: 1px solid var(--key-border);
       border-radius: 20px;
@@ -71,39 +51,6 @@
     }
 
     .calculator { width: 340px; }
-    .history    { width: 260px; max-height: 560px; display: flex; flex-direction: column; }
-
-    .topbar { margin-bottom: 6px; }
-    .menu { position: relative; display: inline-block; }
-    #menuButton {
-      border: 1px solid var(--key-border);
-      background: var(--key);
-      color: var(--ink);
-      border-radius: 10px;
-      padding: 6px 12px;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-    .menu-list {
-      position: absolute; top: 110%; left: 0; z-index: 5;
-      min-width: 170px;
-      background: var(--key);
-      border: 1px solid var(--key-border);
-      border-radius: 12px;
-      padding: 6px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
-    }
-    .menu-list button {
-      display: block; width: 100%;
-      text-align: left;
-      border: none; background: none;
-      color: var(--ink);
-      padding: 9px 10px;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      cursor: pointer;
-    }
-    .menu-list button:hover { background: var(--key-hover); }
 
     .display {
       text-align: right;
@@ -118,23 +65,6 @@
       overflow-wrap: anywhere;
     }
 
-    .autofill {
-      background: var(--yellow-soft);
-      color: var(--yellow-ink);
-      border-radius: 12px;
-      padding: 10px 12px;
-      margin-bottom: 12px;
-      font-size: 0.9rem;
-    }
-    .autofill p { margin: 0 0 8px; }
-    .autofill .numbers { display: flex; flex-wrap: wrap; gap: 6px; }
-    .autofill button {
-      width: 32px; height: 32px;
-      border: none; border-radius: 8px;
-      background: var(--key); color: var(--yellow-ink);
-      font-weight: 600; cursor: pointer;
-    }
-    .autofill button:hover { background: var(--yellow-ink); color: var(--yellow-soft); }
     .hidden { display: none !important; }
 
     .keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
@@ -159,28 +89,6 @@
     .keys .zero   { grid-column: span 2; }
 
     button:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
-
-    .history-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .history h2   { margin: 0; font-size: 1.1rem; }
-    #clearHistory {
-      border: none; background: none; color: var(--red);
-      cursor: pointer; font-size: 0.9rem;
-    }
-    #historyList { list-style: none; margin: 0; padding: 0; overflow-y: auto; }
-    #historyList li {
-      display: flex; justify-content: space-between; align-items: center;
-      gap: 8px; padding: 10px 6px;
-      border-bottom: 1px solid var(--key-border);
-    }
-    .history-item { cursor: pointer; flex: 1; overflow-wrap: anywhere; }
-    .history-item small { display: block; color: var(--muted); }
-    .history-item strong { font-size: 1.1rem; }
-    .delete {
-      border: none; background: none; color: var(--muted);
-      font-size: 1.2rem; cursor: pointer;
-    }
-    .delete:hover { color: var(--red); }
-    .empty { color: var(--muted); font-size: 0.9rem; padding: 10px 6px; }
   </style>
 </head>
 
@@ -188,24 +96,11 @@
   <main class="app">
 
     <section class="calculator">
-      <div class="topbar">
-        <div class="menu">
-          <button id="menuButton" aria-haspopup="true" aria-expanded="false">Options ▾</button>
-          <div id="menuList" class="menu-list hidden">
-            <button id="toggleHistory">View history</button>
-            <button id="toggleTheme">Dark theme</button>
-          </div>
-        </div>
-      </div>
+</div>
 
       <div class="display">
         <div id="previous"></div>
         <div id="current">0</div>
-      </div>
-
-      <div id="autofill" class="autofill hidden">
-        <p id="autofillText"></p>
-        <div id="autofillButtons" class="numbers"></div>
       </div>
 
       <div class="keys">
@@ -233,35 +128,20 @@
         <button data-key=".">.</button>
       </div>
     </section>
-
-    <aside id="historyPanel" class="history hidden">
-      <div class="history-head">
-        <h2>History</h2>
-        <button id="clearHistory">Clear all</button>
-      </div>
-      <ul id="historyList"></ul>
-    </aside>
-
-  </main>
+</main>
 
   <script>
     const currentEl  = document.getElementById('current');
     const previousEl = document.getElementById('previous');
-    const autofillBox     = document.getElementById('autofill');
-    const autofillText    = document.getElementById('autofillText');
-    const autofillButtons = document.getElementById('autofillButtons');
-    const historyList = document.getElementById('historyList');
 
     const operators = ['+', '-', '×', '÷'];
 
     let expression = '';
     let justCalculated = false;
-    let history = JSON.parse(localStorage.getItem('calcHistory')) || [];
 
     function render() {
       currentEl.textContent = expression || '0';
       currentEl.style.fontSize = expression.length > 14 ? '1.5rem' : '2.4rem';
-      checkAutofill();
     }
 
     function press(key) {
@@ -355,106 +235,11 @@
         return;
       }
 
-      history.unshift({ expr: expr, result: result });
-      saveHistory();
-      renderHistory();
-
       previousEl.textContent = expr + ' =';
       expression = String(result);
       justCalculated = true;
       render();
     }
-
-    function findPattern() {
-      const match = expression.match(/[+\-×÷]\d+\.?\d*$/);
-      if (!match) return null;
-
-      const chunk = match[0];
-      let count = 0;
-      let rest = expression;
-      while (rest.endsWith(chunk)) {
-        count++;
-        rest = rest.slice(0, -chunk.length);
-      }
-      return count >= 3 ? { chunk: chunk, count: count } : null;
-    }
-
-    function checkAutofill() {
-      const pattern = justCalculated ? null : findPattern();
-      if (!pattern) {
-        autofillBox.classList.add('hidden');
-        return;
-      }
-      autofillText.textContent =
-        'Pattern ' + pattern.chunk + ' repeated ' + pattern.count + ' times. Repeat it more:';
-      autofillBox.classList.remove('hidden');
-    }
-
-    for (let n = 1; n <= 10; n++) {
-      const btn = document.createElement('button');
-      btn.textContent = n;
-      btn.addEventListener('click', function () {
-        const pattern = findPattern();
-        if (pattern) {
-          expression += pattern.chunk.repeat(n);
-          render();
-        }
-      });
-      autofillButtons.appendChild(btn);
-    }
-
-    function saveHistory() {
-      localStorage.setItem('calcHistory', JSON.stringify(history));
-    }
-
-    function renderHistory() {
-      historyList.innerHTML = '';
-
-      if (history.length === 0) {
-        const empty = document.createElement('li');
-        empty.className = 'empty';
-        empty.textContent = 'No calculations yet.';
-        historyList.appendChild(empty);
-        return;
-      }
-
-      history.forEach(function (item, index) {
-        const li = document.createElement('li');
-
-        const info = document.createElement('div');
-        info.className = 'history-item';
-        info.innerHTML = '<small></small><strong></strong>';
-        info.querySelector('small').textContent = item.expr + ' =';
-        info.querySelector('strong').textContent = item.result;
-        info.title = 'Click to use this result';
-        info.addEventListener('click', function () {
-          expression = String(item.result);
-          previousEl.textContent = '';
-          justCalculated = true;
-          render();
-        });
-
-        const del = document.createElement('button');
-        del.className = 'delete';
-        del.textContent = '×';
-        del.title = 'Delete this entry';
-        del.addEventListener('click', function () {
-          history.splice(index, 1);
-          saveHistory();
-          renderHistory();
-        });
-
-        li.appendChild(info);
-        li.appendChild(del);
-        historyList.appendChild(li);
-      });
-    }
-
-    document.getElementById('clearHistory').addEventListener('click', function () {
-      history = [];
-      saveHistory();
-      renderHistory();
-    });
 
     document.querySelectorAll('.keys button').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -475,48 +260,7 @@
       else if (e.key === 'Escape') clearAll();
     });
 
-    const menuButton   = document.getElementById('menuButton');
-    const menuList     = document.getElementById('menuList');
-    const historyPanel = document.getElementById('historyPanel');
-    const historyBtn   = document.getElementById('toggleHistory');
-    const themeBtn     = document.getElementById('toggleTheme');
-
-    function closeMenu() {
-      menuList.classList.add('hidden');
-      menuButton.setAttribute('aria-expanded', 'false');
-    }
-
-    menuButton.addEventListener('click', function () {
-      const isOpen = menuList.classList.toggle('hidden') === false;
-      menuButton.setAttribute('aria-expanded', String(isOpen));
-    });
-
-    document.addEventListener('click', function (e) {
-      if (!e.target.closest('.menu')) closeMenu();
-    });
-
-    historyBtn.addEventListener('click', function () {
-      const isHidden = historyPanel.classList.toggle('hidden');
-      historyBtn.textContent = isHidden ? 'View history' : 'Hide history';
-      closeMenu();
-    });
-
-    function setTheme(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      themeBtn.textContent = (theme === 'dark') ? 'Light theme' : 'Dark theme';
-      localStorage.setItem('calcTheme', theme);
-    }
-
-    themeBtn.addEventListener('click', function () {
-      const now = document.documentElement.getAttribute('data-theme');
-      setTheme(now === 'dark' ? 'light' : 'dark');
-      closeMenu();
-    });
-
-    setTheme(localStorage.getItem('calcTheme') || 'light');
-
     render();
-    renderHistory();
   </script>
 </body>
 </html>
